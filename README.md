@@ -21,7 +21,7 @@ There is nothing fancy about the output.
 ## Requirements/Infrastructure
 This was created in a home lab and is not part of a large corporate IT department.
 * hMAIL is running on a Windows 2019 server.
-  Logging must be enabled and "TCP/IP" transactions checked.
+  Logging must be enabled and "TCP/IP" transactions checked. Other entries can be selected for your needs, but won't be read by this script.
 * The PHP code is running on a Ubuntu 20.04.6 LTS that has Apache and PHP installed.
 
 ## Customization for this script needed on your part
