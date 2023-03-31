@@ -34,11 +34,16 @@ foreach($array_data as $IPdata => $counter){
     break;
   }
 }
+#######################################################################
+### End of mainline
+#######################################################################
+
 
 ### Function to read the directory share to obtain the log files to read.
 ### As each log file is determined, call another function to summarize
 ### each IP address that is encountered.
 function fct_readdir(){
+  # Users must change this hard coding to suit their methods for accessing the hMAIL logs.
   $systemname = 'ftp://10.126.26.43/';
   $dirlist = scandir($systemname,1);
   foreach($dirlist as $direntry){
@@ -55,12 +60,15 @@ function fct_readdir(){
 
 ### Function to update the "global" data array (argument is by reference)
 function fct_readfile($arg_file_input, &$array_data){
+  # Users must change this hard coding to accomdate NOT reading their local LAN IPs.
   $LANips = '10.126.26.';
   $myfile = fopen($arg_file_input, "r") or die("Unable to open file!");
   while(!feof($myfile)){
     $thisline = fgets($myfile);
     if(substr($thisline,1,5) == 'TCPIP'){
       // Find the date and time (including microseconds)
+      // This is currently not used in this program, but may allow a date and time search 
+      // In a future relase.
       preg_match_all('/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{3}/', $thisline, $arrayresult1);
       $datein = $arrayresult1[0][0];
       // Find the "key"; this section of the string contains "TCP - ###.###.###.### connected". do not use the other
