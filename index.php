@@ -39,12 +39,13 @@ foreach($array_data as $IPdata => $counter){
 ### As each log file is determined, call another function to summarize
 ### each IP address that is encountered.
 function fct_readdir(){
-  $dirlist = scandir('ftp://10.126.26.43/',1);
+  $systemname = 'ftp://10.126.26.43/';
+  $dirlist = scandir($systemname,1);
   foreach($dirlist as $direntry){
     preg_match_all('/hmailserver_\d{4}-\d{2}-\d{2}.log/',$direntry, $regexresult);
     foreach($regexresult as $indfile){
       if($indfile[0] != ''){
-        $parm_file = 'ftp://10.126.26.43/'.$indfile[0];
+        $parm_file = $systemname.$indfile[0];
         fct_readfile($parm_file, $array_data);  # Use argument by reference for the array
       }
     }
@@ -54,6 +55,7 @@ function fct_readdir(){
 
 ### Function to update the "global" data array (argument is by reference)
 function fct_readfile($arg_file_input, &$array_data){
+  $LANips = '10.126.26.';
   $myfile = fopen($arg_file_input, "r") or die("Unable to open file!");
   while(!feof($myfile)){
     $thisline = fgets($myfile);
@@ -73,7 +75,7 @@ function fct_readfile($arg_file_input, &$array_data){
       }
       $IPin = $arrayresult3[0][0];
       // If there is a valid IP (not blank and not part of the LAN address space), include the row
-      if($IPin != '10.126.26.' and $IPin != ''){
+      if($IPin != $LANips and $IPin != ''){
         $tmpcounter = $array_data[$IPin];
         $tmpcounter++;
         $array_data[$IPin] = $tmpcounter;
