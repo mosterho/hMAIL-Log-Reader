@@ -16,7 +16,7 @@ There is nothing fancy about the output.
 * This in turn calls a function that summarizes the data for each IP read in the logs.
   The rows retrieved via REGEX are "TCPIP" entries.
   The actual line searched for using REGEX is "TCP - 123.123.123.123 connected"
-* Example:  "TCPIP"	2696	"2023-03-29 00:00:05.809"	"**TCP - 10.126.26.136 connected** to 10.126.26.43:25."
+* Example:  "TCPIP"	2696	"2023-03-29 00:00:05.809"	"***TCP - 10.126.26.136 connected*** to 10.126.26.43:25."
 * Sort and print data up to the number of entries requested in the URL argument.
 
 ## Requirements/Infrastructure
