@@ -55,3 +55,5 @@ The "?arg_entries" argument will display the highest number of hits/entries; in 
 The "?arg_numberoflogs" argument is optional and will read ### number of logs; in this case, 5. If the argument is not specified, it will default to 9999999.
 
 ![screen cap of top 10 external IP addresses summarized from logs](Example1.PNG)
+
+![screen cap of top 10 external IP addresses summarized from 5 logs](Example2.PNG)

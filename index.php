@@ -17,16 +17,13 @@
 $array_data = array();
 $argentryIPs = $_GET['arg_entries']; # Specify the number of IPs to print
 $argentryfiles = $_GET['arg_numberoflogs'];   #Number of logs to read
+
 if(isset($argentryfiles)){
 }
 else {
   $argentryfiles = 9999999;
 }
 
-#echo $argentryfiles;
-#if($argentryfiles is null or !$argentryfiles){
-#  $argentryfiles = 99999999;
-#}
 echo '<p> ';
 echo '<br>hMAIL log reader program...';
 echo '<br>Number of IPs to print?: '.$argentryIPs;
@@ -69,7 +66,7 @@ function fct_readdir($argentryfiles){
         $idx_files++;
       }
       if($idx_files >= $argentryfiles){
-        break 2;
+        break 2;  # Use break 2 to get out of both FOREACH loops
       }
     }
   }
