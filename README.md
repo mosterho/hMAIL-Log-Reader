@@ -25,7 +25,8 @@ This was created in a home lab and is not part of a large corporate IT departmen
 * The PHP code is running on a Ubuntu 20.04.6 LTS that has Apache and PHP installed.
 
 ## Customization for this script needed on your part
-* The first line of the fct_readdir function contains the path that houses the log files. Change the system name and/or path that points to your log files.
+* ~~The first line of the fct_readdir function contains the path that houses the log files. Change the system name and/or path that points to your log files.~~
+  UPDATE: path to logs is now in "logreaderapp.json"
   On my Windows system, I setup FTP (IIS is installed by default) for reading the logs. Since this PHP script is used only internally, I setup FTP to access the folder using "anonymous".
   Note: my logs are changed daily and are not zipped/compressed.
 * The first line of the fct_readfile function contains internal LAN IPs (three octets) that can be ignored.
@@ -53,7 +54,7 @@ or
 http://127.0.0.1:8099/index.php?arg_entries=10&arg_numberoflogs=5
 
 The "?arg_entries" argument will display the highest number of hits/entries; in this case, 10.
-The "?arg_numberoflogs" argument is optional and will read ### number of logs; in this case, 5. If the argument is not specified, it will default to 9999999.
+The "?arg_numberoflogs" argument is optional and will read ### number of logs; in this case, 5. If the argument is not specified, it will default to ~~9999999~~ the number of logs actually read.
 
 ![screen cap of top 10 external IP addresses summarized from logs](Example1.PNG)
 
