@@ -22,6 +22,7 @@ class cls_logdata {
   public $wrk_whitelist ;
   public $wrk_blacklist ;
   public int $wrk_nbr_of_files_read = 0;
+  public int $wrk_nbr_of_IPs_read = 0;
 
   function __construct() {
     ### Read the JSON file for application variables
@@ -55,7 +56,6 @@ class cls_logdata {
         }
       }
     }
-    #return this->$array_data;
   }
 
   ### Function to update the "global" data array (argument is by reference)
@@ -103,7 +103,11 @@ class cls_logdata {
 ### 1. setup array for data, acept argument, print header info
 $argentryIPs = $_GET['arg_entries']; # Specify the number of IPs to print
 $argentryfiles = $_GET['arg_numberoflogs'];   #Number of logs to read
-
+if(isset($argentryIPs)){
+}
+else {
+  $argentryIPs = PHP_INT_MAX;
+}
 if(isset($argentryfiles)){
 }
 else {
@@ -111,12 +115,17 @@ else {
 }
 
 ### 2. call function that reads the directory entries. (The path is a predetermined Share)
-### the function call will return the array of data that includes an IP address and the number of
+### the class function will keep the array of data that includes an IP address and the number of
 ### times it was found in the logs.
 $cls_logs = new cls_logdata();
 $cls_logs->fct_readdir($argentryfiles);
-### sort and print the array data, but only up to the number of entries requested by the URL argument.
+
+### sort and print the array data.
 arsort($cls_logs->array_data);
+### if the arg_entries URL arugment was not specified, determine the number of IPs in the array.
+if($argentryIPs == PHP_INT_MAX){
+  $argentryIPs = count($cls_logs->array_data);
+}
 
 echo '<p> ';
 echo '<br>hMAIL log reader program...';
@@ -124,6 +133,7 @@ echo '<br>Number of IPs to print?: '.$argentryIPs;
 echo '<br>Number of most recent logs that were read?: '.$cls_logs->wrk_nbr_of_files_read;
 echo '<br>';
 
+### print the array data, but only the number of entries requested in the URL argument.
 $idx = 0;
 foreach($cls_logs->array_data as $IPdata=>$counter){
   echo '<br>IP: '.$IPdata.' Counter: '.$counter;
