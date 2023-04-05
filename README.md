@@ -22,7 +22,7 @@ There is nothing fancy about the web-based output.
 This was created in a home lab and is not part of a large corporate IT department.
 * I have hMAIL running on a Windows 2019 server (but can be any server supported by hMAIL).
   Logging must be enabled and "TCP/IP" transactions checked. Other entries can be selected for your needs, but won't affect this script.
-* The PHP code that I have running on a Ubuntu 20.04.6 LTS that has Apache and PHP installed.
+* The web server that I have running is a Ubuntu 20.04.6 LTS that has Apache version 2.4.41 and PHP version 7.4.3 installed.
 
 ## Customization for this script needed on your part
 * ~~The first line of the fct_readdir function contains the path that houses the log files. Change the system name and/or path that points to your log files.~~
