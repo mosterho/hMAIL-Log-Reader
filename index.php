@@ -61,7 +61,7 @@ class cls_logdata {
   ### Function to update the "global" data array (argument is by reference)
   function fct_readfile($arg_file_input){
     # Users must change this hard coding to accomdate NOT reading their local LAN IPs.
-    $LANips = '10.126.26.';
+    #$LANips = '10.126.26.';
     $myfile = fopen($arg_file_input, "r") or die("Unable to open file!");
     while(!feof($myfile)){
       $thisline = fgets($myfile);
@@ -75,22 +75,72 @@ class cls_logdata {
         $temp = $arrayresult2[0][0];
         // If the section of string is found, narrow it down to IP address three octets
         if($temp != ''){
-          preg_match_all('/\d{1,3}.\d{1,3}.\d{1,3}./', $temp, $arrayresult3);
+          preg_match_all('/\d{1,3}.\d{1,3}.\d{1,3}/', $temp, $arrayresult3);
         }
         else {
           $arrayresult3[0][0] = '';
         }
-        $IPin = $arrayresult3[0][0];
-        // If there is a valid IP (not blank and not part of the LAN address space), include the row
-        if($IPin != $LANips and $IPin != ''){
-          $tmpcounter = $this->array_data[$IPin];
-          $tmpcounter++;
-          $this->array_data[$IPin] = $tmpcounter;
+        ## For practical reason, will use the first 3 octets for comparison (for now)
+        if($arrayresult3[0][0] != ''){
+          $IPin = $arrayresult3[0][0].'.0/24';
+          // If there is a valid IP (not blank and not part of the whitelist LAN address space), include the row
+          if(!in_array($IPin, $this->wrk_whitelist)){
+            #var_dump('<br>var_dump if key exists<br>',$IPin,'<br>',$this->wrk_whitelist);
+            $tmpcounter = $this->array_data[$IPin];
+            $tmpcounter++;
+            $this->array_data[$IPin] = $tmpcounter;
+          }
         }
       }
     }
     fclose($myfile);
   }
+
+  ### FUTURE enhancement!!!!
+  ### Function to narrow down CIDR notation to its "level" of  octet notation
+  ### I'm sure there is a module I could download, but it was fun to figure out.
+  function fct_IP_CIDR($arg_IP_with_CIDR){
+    ### Look for the "/" and determine the prefix bits (i.e., /8, /16, /24, /32)
+    ### NOTE: using ## as the delimiter for REGEX rather than the usual //
+    ### but still need \ as an escape character for the /
+    $result32 = array();
+    $result24 = array();
+    $result16 = array();
+    $result8 =  array();
+    ##$IP_POS = str_pos($arg_IP_with_CIDR, '/');
+    if(preg_match('#\/\d{1,2}#', $arg_IP_with_CIDR, $wrk_matched)){
+      var_dump($arg_IP_with_CIDR, $wrk_matched, '***** GOOD!');
+    }
+    else {
+      var_dump($arg_IP_with_CIDR, '*** NO GOOD');
+    }
+    // After determining the prefix bits, assign various octets to test.
+    switch($wrk_matched[0]){
+      case '/32':
+      preg_match('/\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}/', $arg_IP_with_CIDR, $result32);
+      preg_match('/\d{1,3}.\d{1,3}.\d{1,3}./', $arg_IP_with_CIDR, $result24);
+      preg_match('/\d{1,3}.\d{1,3}./', $arg_IP_with_CIDR, $result16);
+      preg_match('/\d{1,3}./', $arg_IP_with_CIDR, $result8);
+      break;
+      case '/24':
+      preg_match('/\d{1,3}.\d{1,3}.\d{1,3}./', $arg_IP_with_CIDR, $result24);
+      preg_match('/\d{1,3}.\d{1,3}./', $arg_IP_with_CIDR, $result16);
+      preg_match('/\d{1,3}./', $arg_IP_with_CIDR, $result8);
+      break;
+      case '/16':
+      preg_match('/\d{1,3}.\d{1,3}./', $arg_IP_with_CIDR, $result16);
+      preg_match('/\d{1,3}./', $arg_IP_with_CIDR, $result8);
+      break;
+      case '/8':
+      preg_match('/\d{1,3}./', $arg_IP_with_CIDR, $result8);
+      break;
+      default:
+      echo '<br>Got something other than /8, /16, /24, /32: '.$arg_IP_with_CIDR;
+    }
+    echo '<br>Within fct_IP_CIDR... '.$arg_IP_with_CIDR.' and <br>';
+    var_dump($result32, '<br>', $result24, '<br>', $result16, '<br>' ,$result8 );
+  }
+
 }
 #######################################################################
 ### End of class object
@@ -127,6 +177,14 @@ if($argentryIPs == PHP_INT_MAX){
   $argentryIPs = count($cls_logs->array_data);
 }
 
+### Debug only...
+if(1==2){
+  foreach($cls_logs->wrk_whitelist as $IPCIDR){
+    print '<br>Debug CIDR...'.$IPCIDR;
+    $cls_logs->fct_IP_CIDR($IPCIDR);
+  }
+}
+
 echo '<p> ';
 echo '<br>hMAIL log reader program...';
 echo '<br>Number of IPs to print?: '.$argentryIPs;
@@ -136,7 +194,10 @@ echo '<br>';
 ### print the array data, but only the number of entries requested in the URL argument.
 $idx = 0;
 foreach($cls_logs->array_data as $IPdata=>$counter){
-  echo '<br>IP: '.$IPdata.' Counter: '.$counter;
+  echo '<br>IP: '.$IPdata.'  Counter: '.$counter;
+  if(in_array($IPdata, $cls_logs->wrk_blacklist)){
+    echo ' *** In Blacklist!';
+  }
   $idx++;
   if($idx >= $argentryIPs){
     break;

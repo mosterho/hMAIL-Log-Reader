@@ -1,5 +1,5 @@
 # hMAIL Log Reader
-This is a very simple PHP script will read some or ALL of the hMAIL logs that contain TCPIP data
+This is a relatively simple PHP script will read some or ALL of the hMAIL logs that contain TCPIP data
 and then summarize the external IP addresses (first three octets) with the most TCPIP hits.
 There is nothing fancy about the web-based output.
 
@@ -20,23 +20,28 @@ There is nothing fancy about the web-based output.
 
 ## Requirements/Infrastructure
 This was created in a home lab and is not part of a large corporate IT department.
-* hMAIL is running on a Windows 2019 server.
+* I have hMAIL running on a Windows 2019 server (but can be any server supported by hMAIL).
   Logging must be enabled and "TCP/IP" transactions checked. Other entries can be selected for your needs, but won't affect this script.
-* The PHP code is running on a Ubuntu 20.04.6 LTS that has Apache and PHP installed.
+* The PHP code that I have running on a Ubuntu 20.04.6 LTS that has Apache and PHP installed.
 
 ## Customization for this script needed on your part
 * ~~The first line of the fct_readdir function contains the path that houses the log files. Change the system name and/or path that points to your log files.~~
   UPDATE: path to logs is now in "logreaderapp.json".
   On my Windows system, I setup FTP (IIS is installed by default) for reading the logs. Since this PHP script is used only internally, I setup FTP to access the folder using "anonymous".
   Note: my logs are changed daily and are not zipped/compressed.
-* The first line of the fct_readfile function contains internal LAN IPs (three octets) that can be ignored.
+* ~~The first line of the fct_readfile function contains internal LAN IPs (three octets) that can be ignored.~~
+  UPDATE: LAN IP addresses in the whitelist and external IP addresses that are blacklisted can be setup in the logreaderapp.json file.
+  CAVEAT: only /24 addresses are validate at this time.
 
 ## Recent updates
 * Added second URL argument for "number of most recent logs to read".
 * Both URL arguments are optional. Please note that the script will include all entries for all logs in the file path specified in the logreaderapp.json file.
+* The path to read the log files are in the logreaderapp.json file.
+* Both whitelist and blacklist are functional based on logreaderapp.file. If an IP address is in the blacklist, the script will show ***In Blacklist!*** alongside the Counter value.
+  PLEASE NOTE: only /24 addresses are valid at this time.
 
 ## Future changes?
-* **Partial update** Replace hard coded entries (hMAIL log directory, whitelist/blacklist IP addresses) with something flexible, such as .INI or .CONF files.
+* **Updated** Replace hard coded entries (hMAIL log directory, whitelist/blacklist IP addresses) with something flexible, ~~such as .INI or .CONF~~ .JSON file.
     A whitelist could be useful to bypass your internal LAN addresses.
     A blacklist can identify IP addresses that are blacklisted on a firewall, reverse proxy, etc.
 * **Updated** Add a second URL argument to limit the number of logs read rather than read all of them (e.g., read only the last three days of logs)
@@ -48,7 +53,7 @@ This was created in a home lab and is not part of a large corporate IT departmen
 * Create a version of this using hashbang in Python for a Windows command prompt or Unix terminal??
 
 ## How to call the URL
-This depends on how and where the web server is installed (IIS, Apache), and any specific ports used. If the script is on a local web server, the call to this program is:
+This depends on how and where the web server is installed (IIS, Apache), and any specific ports used. Please see the examples below for URL calls to a named server and localhost.
 
 The "?arg_entries" argument **is optional** will display the highest number of hits/entries; in this case, the argument is specified as 10. The "?arg_numberoflogs" argument **is also optional** and will read the path's logs; in this case the argument is specified as 5.
 
@@ -58,17 +63,20 @@ http://ubuntu20desktop03.marty.local:8099/index.php?arg_entries=10&arg_numberofl
 or
 
 The "?arg_entries" argument is specified and will display the highest number of hits/entries; in this case, the argument is specified as 10. The "?arg_numberoflogs" argument is not specified and will read all of the path's logs;
+
 http://127.0.0.1:8099/index.php?arg_entries=10
 ![screen cap of top 10 external IP addresses summarized from logs](Example1.PNG)
 
 or
 
 The "?arg_entries" argument is not specified and will display the highest number of hits/entries. The "?arg_numberoflogs" argument is specified and will read all of the path's logs; in this case the argument is specified as 5.
+
 http://ubuntu20desktop03.marty.local:8099/index.php?arg_numberoflogs=5
 ![screen cap of top 10 external IP addresses summarized from 5 logs](Example2.PNG)
 
 or
 
 If neither argument is specified, they will default to the most entries for both the number of IPs to read and the number of logs to read in the file path.
+
 http://ubuntu20desktop03.marty.local:8099/index.php
 ![screen cap of all external IP addresses summarized from all logs](Example3.PNG)
