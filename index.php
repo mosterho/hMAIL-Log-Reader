@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="mystyle.css">
+</head>
+<body>
 <?php
 /*
 ###########################################################################
@@ -150,6 +156,12 @@ class cls_logdata {
 ### Begin mainline
 #######################################################################
 
+### When running from a command prompt/terminal, turn off notifications,
+### but allow errors to appear.
+if(php_sapi_name() == 'cli'){
+  error_reporting(E_ALL & ~E_NOTICE);
+}
+
 ### 1. setup array for data, acept argument, print header info
 $argentryIPs = $_GET['arg_entries']; # Specify the number of IPs to print
 $argentryfiles = $_GET['arg_numberoflogs'];   #Number of logs to read
@@ -185,23 +197,29 @@ if(1==2){
   }
 }
 
-echo '<p> ';
-echo '<br>hMAIL log reader program...';
-echo '<br>Number of IPs to print?: '.$argentryIPs;
-echo '<br>Number of most recent logs that were read?: '.$cls_logs->wrk_nbr_of_files_read;
-echo '<br>';
+echo '<h1>hMail log reader program</h1>';
+echo '<h3>Number of IPs to print?: '.$argentryIPs.'</h3>';
+echo '<h3>Number of most recent logs that were read?: '.$cls_logs->wrk_nbr_of_files_read.'</h3>';
 
 ### print the array data, but only the number of entries requested in the URL argument.
+echo '<table>';
+echo '<tr>';
+echo '<th class="IP">IPv4</th><th class="counter">Counter</th><th class="blacklist">Blacklisted?</th>';
+echo '</tr>';
 $idx = 0;
 foreach($cls_logs->array_data as $IPdata=>$counter){
-  echo '<br>IP: '.$IPdata.'  Counter: '.$counter;
+  echo '<tr>';
+  echo '<td class="IP">'.$IPdata.'</td><td class="counter">'.$counter.'</td>';
   if(in_array($IPdata, $cls_logs->wrk_blacklist)){
-    echo ' *** In Blacklist!';
+    echo '<td class="blacklist">Blacklisted</td>';
   }
+  echo '</tr>';
   $idx++;
   if($idx >= $argentryIPs){
     break;
   }
 }
-
+echo '</table>';
 ?>
+</body>
+</html>

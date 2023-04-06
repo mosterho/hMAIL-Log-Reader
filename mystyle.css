@@ -1,0 +1,25 @@
+body{
+  background-color: lightblue;
+}
+
+table{
+  width: 20%;
+  border: 1px solid;
+}
+
+th, td{
+  border: 1px solid;
+  padding: 3px;
+}
+
+.IP{
+  text-align: left;
+}
+
+.counter{
+  text-align: right;
+}
+
+.blacklist{
+  text-align: center;
+}
