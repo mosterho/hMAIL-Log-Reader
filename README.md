@@ -21,22 +21,22 @@ This was created in a home lab and is not part of a large corporate IT departmen
 * The web server that I have running is a Ubuntu 20.04.6 LTS that has Apache version 2.4.41 and PHP version 7.4.3 installed.
 
 ## Installation and Customization for this script needed on your part
-This is installed on a Ubuntu Linux server utilizing Apache. In my setup, three files are installed in the folder path "/var/www/phptest":
+This is installed on a Ubuntu Linux server utilizing Apache. Only three files are installed in the Apache web folder path "/var/www/phptest":
 - index.php
 - logreaderapp.json
 - mystyle.css
-
-If you are running Apache, you will need to update:
-- your "ports.conf" to include a specific port
-- add a separate folder in the "sites-available" and "sites-enabled" folders.
 
 Change the "logreaderapp.json".
 - change the "path" to reflect your system name and file path
 - add any desired IPv4 addresses to whitelist. This is setup as an array.
 - add any IPv4 addresses to show on the webpage that could be blacklisted in your firewall, reverse proxy, etc. This is also an array.
 
-On my Windows system, I setup FTP (IIS is installed by default) for reading the logs. Since this PHP script is used only internally, I setup FTP to access the folder using "anonymous".
-My logs are changed daily and are not zipped/compressed.
+If you are running Apache, you will need to update:
+- your "ports.conf" to include a specific port
+- add a separate folder in the "sites-available" and "sites-enabled" folders.
+
+On my Windows system, I setup FTP (IIS is installed by default) for reading the logs. Since this PHP script is used only internally, I setup FTP to access the folder using "anonymous". My logs are changed daily and are not zipped/compressed.
+
 CAVEAT: only IPv4 /24 addresses are valid at this time.
 
 
