@@ -12,14 +12,14 @@ th, td{
   padding: 3px;
 }
 
-.IP{
+.mydataleft{
   text-align: left;
 }
 
-.counter{
+.mydataright{
   text-align: right;
 }
 
-.blacklist{
+.mydatacenter{
   text-align: center;
 }
