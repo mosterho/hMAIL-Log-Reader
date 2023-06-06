@@ -17,25 +17,25 @@ This is a relatively simple PHP script will read some or ALL of the hMail logs t
 
 ## Requirements/Infrastructure
 This was created in a home lab and is not part of a large corporate IT department.
-* I have hMail running on a Windows 2019 server (but can be any server supported by hMail). Logging must be enabled and "TCP/IP" transactions checked. Other entries can be selected for your needs, but won't affect this script.
+* I have hMail running on a Windows 2019 server. hMail logging must be enabled and "TCP/IP" transactions checked. Other entries can be selected for your needs, but won't affect this script.
 * The web server that I have running is a Ubuntu 20.04.6 LTS that has Apache version 2.4.41 and PHP version 7.4.3 installed.
 
-## Installation and Customization for this script needed on your part
-This is installed on a Ubuntu Linux server utilizing Apache. Only three files are installed in the Apache web folder path "/var/www/phptest":
+## Installation
+Once a web server is setup, three files are needed:
 - index.php
 - logreaderapp.json
 - mystyle.css
 
 Change the "logreaderapp.json".
-- change the "path" to reflect your system name and file path
+- change the "path" section to reflect your system name and file path
 - add any desired IPv4 addresses to whitelist. This is setup as an array.
 - add any IPv4 addresses to show on the webpage that could be blacklisted in your firewall, reverse proxy, etc. This is also an array.
 
-If you are running Apache, you will need to update:
+If you are running Apache, you may need to update:
 - your "ports.conf" to include a specific port
 - add a separate folder in the "sites-available" and "sites-enabled" folders.
 
-On my Windows system, I setup FTP (IIS is installed by default) for reading the logs. Since this PHP script is used only internally, I setup FTP to access the folder using "anonymous". My logs are changed daily and are not zipped/compressed.
+On my Windows 2019 system, I setup FTP for reading the logs. Since this PHP script is used only internally, I setup FTP to access the folder using "anonymous". My logs are changed daily and are not zipped/compressed.
 
 CAVEAT: only IPv4 /24 addresses are valid at this time.
 
@@ -51,7 +51,7 @@ CAVEAT: only IPv4 /24 addresses are valid at this time.
 ## Future changes?
 * Add a third URL argument to perform searches by date and time or change this script to utilize a form.
 * Test using IIS (not sure if running this on the same server as hMail is a security issue?).
-* **In Progress**Update this script to enable using a Windows command prompt or Unix terminal. That way a web server isn't required to run this.
+* **In Progress** Update this script to enable using a Windows command prompt or Unix terminal. That way a web server isn't required to run this.
 
 ## How to call the URL
 This depends on where the web page is called from (localhost or another host), and any specific ports used. Please see the examples below for URL calls to a named server and localhost (127.0.0.1).
@@ -62,7 +62,7 @@ http://127.0.0.1:8099/index.php?arg_entries=10&arg_numberoflogs=5
 
 * The "?arg_entries" argument **is optional** will display the highest number of hits/entries; in this case, the argument is specified as 10.
 * The "?arg_numberoflogs" argument **is also optional** and will read the path's logs; in this case the argument is specified as 5.
-* If either or both arguments is/are omitted, the web page will display the actual numbers encountered.
+* If either or both arguments are omitted, the web page will display the actual number of log files and IP addresses that were read.
 
 ![screen cap of top 10 external IP addresses summarized from 5 logs](Example4.PNG)
 
