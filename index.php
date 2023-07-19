@@ -10,6 +10,9 @@
 #######################################################################
 ### Define class object and functions
 #######################################################################
+
+include '/var/www/Geolocate/geolocate_API.php';
+
 class cls_logdata {
   public $array_data;
   public $JSONdata;
@@ -88,6 +91,7 @@ class cls_logdata {
           ## For practical reasons, use the first 3 octets to get a /24 bit address for comparison (for now)
           if($arrayresult3[0][0] != ''){
             $IPin = $arrayresult3[0][0].'.0/24';
+            //$IPin = $arrayresult3[0][0];
             // If there is a valid IP that is not in the whitelist array, add/update the data.
             if(!in_array($IPin, $this->wrk_whitelist)){
               ## Set default values for counter and date (in case of new IP entry)
@@ -158,7 +162,8 @@ class cls_logdata {
     echo '<h4>Number of most recent logs that were read?: '.$this->wrk_nbr_of_files_read.'</h4>';
     $wrk_button_arg = '\''.$this->sort_order.'\', '.$this->array_data.', '.$this->wrk_blacklist;
     echo '<p>';
-    echo '<button type="button" id="sort_button" oncLick="fct_button_click('.$wrk_button_arg.')">Sort by Latest hit</button><p></p>';
+    // "Sort" button doesn't seem to work, comment out for now.
+    //echo '<button type="button" id="sort_button" oncLick="fct_button_click('.$wrk_button_arg.')">Sort by Latest hit</button><p></p>';
 
     $this->fct_output_table();  // Function to output table rows part of web page.
     ## JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES
@@ -175,7 +180,7 @@ class cls_logdata {
   function fct_output_table(){
     echo '<table class="w3-table-all w3-third w3-small">';
     echo '<tr>';
-    echo '<th class="w3-left-align">IPv4</th><th class="w3-right-align">Counter</th><th class="w3-center">Latest hit</th><th class="w3-left-align">Blacklisted?</th>';
+    echo '<th class="w3-left-align">IPv4</th><th class="w3-left-align">Location info</th><th class="w3-right-align">Counter</th><th class="w3-center">Latest hit</th><th class="w3-left-align">Blacklisted?</th>';
     echo '</tr>';
     $idx = 0;
     foreach($this->array_data as $IPdata=>$wrk_array){
@@ -193,7 +198,22 @@ class cls_logdata {
         else{
           $wrk_addremove = 'Add';
         }
-        echo '<td class="w3-left-align" id="'.$arg_IPid.'">'.$IPdata.'</td><td class="w3-right-align">'.$counter.'</td><td class="w3-center">'.$datein.'</td>';
+        $IP_to_geolocate = substr_replace($IPdata,'1',-4);  //Remove the '/24' from the string
+        $wrk_cls_api = new cls_geolocateapi();
+        $wrk_cls_api->fct_retrieve_IP_info($IP_to_geolocate);
+        $tempobj = json_decode($wrk_cls_api->response);  // convert returned geolocate information in JSON to php object.
+        // Piece together the location (e.g., city, region, state)
+        //var_dump($tempobj);
+        $this_location = '';
+        $this_location .= $tempobj->{"city_name"};
+        if($this_location != ''){
+          $this_location .= ', '.$tempobj->{"region_name"};
+        }
+        if($this_location != ''){
+          $this_location .= ', '.$tempobj->{"country_name"};
+        }
+
+        echo '<td class="w3-left-align" id="'.$arg_IPid.'">'.$IPdata.'</td><td class="w3-left-align">'.$this_location.'</td><td class="w3-right-align">'.$counter.'</td><td class="w3-center">'.$datein.'</td>';
         echo '<td><button  type="button" id="'.$arg_blacklist.'" onclick="fct_blacklist(\''.$IPdata.'\', \''.$wrk_addremove.'\')">'.$wrk_addremove.' IP from/to Blacklist?</button></td>';
         echo '</tr>';
         ## Check on the number of IPs to display on the webpage against the argument in the URL.
