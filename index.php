@@ -198,18 +198,21 @@ class cls_logdata {
         else{
           $wrk_addremove = 'Add';
         }
-        $IP_to_geolocate = substr_replace($IPdata,'1',-4);  //Remove the '/24' from the string
+        //Remove the '0/24' from the string and replace the 4th octet with '1'.
+        $IP_to_geolocate = substr_replace($IPdata,'1',-4);
         $wrk_cls_api = new cls_geolocateapi();
         $wrk_cls_api->fct_retrieve_IP_info($IP_to_geolocate);
-        $tempobj = json_decode($wrk_cls_api->response);  // convert returned geolocate information in JSON to php object.
-        // Piece together the location (e.g., city, region, state)
-        //var_dump($tempobj);
+        $tempobj = json_decode($wrk_cls_api->response);  // convert returned geolocate information from JSON to php object.
+
+        // Piece together the location (e.g., city, region/state, country)
         $this_location = '';
-        $this_location .= $tempobj->{"city_name"};
-        if($this_location != ''){
-          $this_location .= ', '.$tempobj->{"region_name"};
+        if( $tempobj->{"city_name"} != ''){
+          $this_location .= $tempobj->{"city_name"};
         }
-        if($this_location != ''){
+        if($tempobj->{"region_name"} != ''){
+          $this_location .= ', '.$tempobj->{"region_name"} ;
+        }
+        if($tempobj->{"country_name"} != ''){
           $this_location .= ', '.$tempobj->{"country_name"};
         }
 
