@@ -11,8 +11,6 @@
 ### Define class object and functions
 #######################################################################
 
-include '/var/www/Geolocate/geolocate_API.php';
-
 class cls_logdata {
   public $array_data;
   public $JSONdata;
@@ -22,6 +20,7 @@ class cls_logdata {
   public $wrk_nbr_of_files_read = 0;
   public $wrk_nbr_of_IPs_read = 0;
   public $sort_order = 'latest_hit';
+  public $geolocate_available = False;
 
   ### __construct function of class to read the JSON file
   ### and setup application variables.
@@ -31,6 +30,10 @@ class cls_logdata {
     $this->app_path       = $this->JSONdata['path'];
     $this->wrk_whitelist  = $this->JSONdata['whitelist'];
     $this->wrk_blacklist  = $this->JSONdata['blacklist'];
+    if(file_exists('/var/www/Geolocate/geolocate_API.php')){
+      include '/var/www/Geolocate/geolocate_API.php';
+      $this->geolocate_available = True;
+    }
   }
 
   ### Function to read the directory share to obtain the log files to read.
@@ -198,22 +201,29 @@ class cls_logdata {
         else{
           $wrk_addremove = 'Add';
         }
-        //Remove the '0/24' from the string and replace the 4th octet with '1'.
-        $IP_to_geolocate = substr_replace($IPdata,'1',-4);
-        $wrk_cls_api = new cls_geolocateapi();
-        $wrk_cls_api->fct_retrieve_IP_info($IP_to_geolocate);
-        $tempobj = json_decode($wrk_cls_api->response);  // convert returned geolocate information from JSON to php object.
 
-        // Piece together the location (e.g., city, region/state, country)
+        // If the Geolocate module is available, setup Location variable for web page.
         $this_location = '';
-        if( $tempobj->{"city_name"} != ''){
-          $this_location .= $tempobj->{"city_name"};
+        if($this->geolocate_available == True){
+          //Remove the '0/24' from the string and replace the 4th octet with '1'.
+          $IP_to_geolocate = substr_replace($IPdata,'1',-4);
+          $wrk_cls_api = new cls_geolocateapi();
+          $wrk_cls_api->fct_retrieve_IP_info($IP_to_geolocate);
+          $tempobj = json_decode($wrk_cls_api->response);  // convert returned geolocate information from JSON to php object.
+
+          // Piece together the location (e.g., city, region/state, country)
+          if( $tempobj->{"city_name"} != ''){
+            $this_location .= $tempobj->{"city_name"};
+          }
+          if($tempobj->{"region_name"} != ''){
+            $this_location .= ', '.$tempobj->{"region_name"} ;
+          }
+          if($tempobj->{"country_name"} != ''){
+            $this_location .= ', '.$tempobj->{"country_name"};
+          }
         }
-        if($tempobj->{"region_name"} != ''){
-          $this_location .= ', '.$tempobj->{"region_name"} ;
-        }
-        if($tempobj->{"country_name"} != ''){
-          $this_location .= ', '.$tempobj->{"country_name"};
+        else{
+          $this_location = 'N/A';
         }
 
         echo '<td class="w3-left-align" id="'.$arg_IPid.'">'.$IPdata.'</td><td class="w3-left-align">'.$this_location.'</td><td class="w3-right-align">'.$counter.'</td><td class="w3-center">'.$datein.'</td>';
