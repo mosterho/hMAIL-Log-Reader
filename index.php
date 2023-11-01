@@ -30,8 +30,8 @@ class cls_logdata {
     $this->app_path       = $this->JSONdata['path'];
     $this->wrk_whitelist  = $this->JSONdata['whitelist'];
     $this->wrk_blacklist  = $this->JSONdata['blacklist'];
-    if(file_exists('/var/www/Geolocate/geolocate_API.php')){
-      include '/var/www/Geolocate/geolocate_API.php';
+    if(file_exists('/home/ESIS/GeoLocate/geolocate_API.php')){
+      include '/home/ESIS/GeoLocate/geolocate_API.php';
       $this->geolocate_available = True;
     }
   }
@@ -207,7 +207,10 @@ class cls_logdata {
         if($this->geolocate_available == True){
           //Remove the '0/24' from the string and replace the 4th octet with '1'.
           $IP_to_geolocate = substr_replace($IPdata,'1',-4);
-          $wrk_cls_api = new cls_geolocateapi();
+          if(is_a($wrk_cls_api, 'cls_geolocateapi') == false){
+            $wrk_cls_api = new cls_geolocateapi();
+          }
+
           $wrk_cls_api->fct_retrieve_IP_info($IP_to_geolocate);
           $tempobj = json_decode($wrk_cls_api->response);  // convert returned geolocate information from JSON to php object.
 
